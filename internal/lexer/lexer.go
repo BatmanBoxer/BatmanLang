@@ -63,24 +63,24 @@ func (lexer *Lexer) lexAlpha() Token {
 	}
 	return parsertoken
 }
-func (lexer *Lexer) lexDigit() Token{
+func (lexer *Lexer) lexDigit() Token {
 	parsertoken := Token{}
-  for {
-    token,err := lexer.peak()
-				if err != nil {
-					break
-				}
-				if !unicode.IsDigit(rune(token)) {
-					value := string(lexer.buf)
-          parsertoken = Token{INT_LIT,&value}
-					lexer.buf = lexer.buf[:0]
-					break
+	for {
+		token, err := lexer.peak()
+		if err != nil {
+			break
+		}
+		if !unicode.IsDigit(rune(token)) {
+			value := string(lexer.buf)
+			parsertoken = Token{INT_LIT, &value}
+			lexer.buf = lexer.buf[:0]
+			break
 
-				} else {
-					lexer.buf = append(lexer.buf, rune(lexer.consume()))
-				}
-			}
-  return parsertoken
+		} else {
+			lexer.buf = append(lexer.buf, rune(lexer.consume()))
+		}
+	}
+	return parsertoken
 }
 func (lexer *Lexer) peak() (byte, error) {
 	var err = errors.New("Failed lexing")
