@@ -4,5 +4,5 @@ fun main(){
   if(a == b){
     print("hello")
   }
-  return b
+   b
 }

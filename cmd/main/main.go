@@ -2,6 +2,7 @@ package main
 
 import (
 	"compileringo/internal/lexer"
+	"compileringo/internal/parser"
 	"fmt"
 	"os"
 )
@@ -16,10 +17,14 @@ func main() {
 
 		tokenizer := lexer.NewLexer(filestring)
 		tokens := tokenizer.Tokenize()
+  
+    parser := parser.NewParser(tokens)
+    ProgramNode := parser.ParseProgram()
 
-    for _,token:= range tokens{
-		   token.Debug()  
-		}
+    fmt.Println(ProgramNode)
+    //for _,token:= range tokens{
+		 //  token.Debug()  
+		//}
 		if err != nil {
 			fmt.Println("file path invalid")
 			os.Exit(1)
