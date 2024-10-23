@@ -17,7 +17,9 @@ func main() {
 		tokenizer := lexer.NewLexer(filestring)
 		tokens := tokenizer.Tokenize()
 
-		fmt.Println(tokens)
+    for _,token:= range tokens{
+		   token.Debug()  
+		}
 		if err != nil {
 			fmt.Println("file path invalid")
 			os.Exit(1)

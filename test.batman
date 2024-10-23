@@ -1,1 +1,8 @@
-return 123;
+fun main(){
+  a = "hello"
+  b = 123
+  if(a == b){
+    print("hello")
+  }
+  return b
+}
