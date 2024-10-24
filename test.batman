@@ -1,8 +1,30 @@
 fun main(){
-  a = "hello"
-  b = 123
-  if(a == b){
-    print("hello")
-  }
-   b
+  var a = "hello"
+  var b = 123
+  print("hello")
+  print("batman")
+  print("hello")
+  print("hello")
+  print("hello")
 }
+
+fun main(){
+  var a = "hello"
+  var b = 123
+  print("hello")
+  print("batman")
+  print("hello")
+  print("hello")
+  print("hello")
+}
+
+fun main(){
+  var a = "hello"
+  var b = 123
+  print("hello")
+  print("batman")
+  print("hello")
+  print("hello")
+  print("hello")
+}
+

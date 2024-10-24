@@ -22,10 +22,8 @@ func main() {
     ProgramNode := parser.ParseProgram()
 
     fmt.Println(ProgramNode)
-    //for _,token:= range tokens{
-		 //  token.Debug()  
-		//}
-		if err != nil {
+	
+    if err != nil {
 			fmt.Println("file path invalid")
 			os.Exit(1)
 		}
