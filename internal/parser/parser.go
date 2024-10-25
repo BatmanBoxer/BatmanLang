@@ -87,18 +87,25 @@ func (parser *Parser) parseBlock() *Block {
 		case lexer.WHILE:
 			loopStatement := parser.parseLoopStatement()
 			block.Body = append(block.Body, loopStatement)
+
 		case lexer.VAR:
 			variableDeclaration := parser.parseVariableDeclaration()
 			block.Body = append(block.Body, variableDeclaration)
+
 		case lexer.IDENTIFIER:
 			if parser.isfunCall() {
 				functionCall := parser.parseFunCall()
 				block.Body = append(block.Body, functionCall)
 			}
 			if parser.isVariableReasign() {
+        fmt.Println("")
 				variableReasign := parser.parseVariableReasign()
 				block.Body = append(block.Body, variableReasign)
 			}
+			if !parser.isVariableReasign() && !parser.isfunCall() && parser.tokens[parser.index].Tokentype ==lexer.IDENTIFIER {
+        panic("invalid use of identifier idiot")
+			}
+
 		case lexer.SEMICOLON:
 			parser.consume()
 		default:
@@ -181,7 +188,7 @@ func (parser *Parser) parseLoopStatement() *LoopStatement {
 }
 
 func (parser *Parser) parsePrintStatement() *PrintStatement {
-	printToken := parser.consume()       // Consume the 'print' keyword.
+	 parser.consume()       // Consume the 'print' keyword.
 	leftbraketToken := parser.consume()  // Consume the (.
 	valueToken := parser.consume()       //Consume the value
 	rightbraketToken := parser.consume() //Consume the ).
@@ -196,8 +203,8 @@ func (parser *Parser) parsePrintStatement() *PrintStatement {
 	}
 
 	return &PrintStatement{
-		Token: printToken,
-		Value: value,
+		Token: valueToken,
+		Value: *value,
 	}
 }
 func (parser *Parser) parseVariableDeclaration() *VariableDeclaration {

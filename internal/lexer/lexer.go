@@ -61,7 +61,7 @@ func (lexer *Lexer) Tokenize() []Token {
 
 		} else if rune(token) == '*' {
 			lexer.consume()
-			tokens = append(tokens, Token{MUNTIPLY, nil})
+			tokens = append(tokens, Token{MULTIPLY, nil})
 
 		} else if rune(token) == '/' {
 			lexer.consume()

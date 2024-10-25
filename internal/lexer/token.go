@@ -5,7 +5,7 @@ import "fmt"
 type TokenType = int
 
 const (
-	null = iota
+	NULL = iota
 	RETURN
 	INT_LIT
 	STRING_LIT
@@ -28,10 +28,10 @@ const (
 	FOR
 	WHILE
 
-  PLUS
-  MINUS
-  MUNTIPLY
-  DIVIDE
+	PLUS
+	MINUS
+	MULTIPLY
+	DIVIDE
 )
 
 type Token struct {

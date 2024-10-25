@@ -1,15 +1,21 @@
+fun test(){
+  print("hello")
+}
 fun main(){
+  print(a)
+  print("hello there")
   var a = "hello";
   var b = 123 + 12;
-  b = 12+123;
+  var b = 12+123;
+  b = 1;
+  b = a;
   print("hello")
-  fun test(){
-  print("from inside")
-  }
   if(a==b){
     print("from if")
   }
   while(b==a){
-    print("loop")
+    print("batman")
   }
+  test()
 } 
+

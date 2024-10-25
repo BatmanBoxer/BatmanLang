@@ -1,6 +1,7 @@
 package main
 
 import (
+	"compileringo/internal/interprete"
 	"compileringo/internal/lexer"
 	"compileringo/internal/parser"
 	"fmt"
@@ -21,8 +22,8 @@ func main() {
     parser := parser.NewParser(tokens)
     ProgramNode := parser.ParseProgram()
 
-    fmt.Println(ProgramNode)
-	
+    interpreter := interpreter.NewInterpreter()
+    interpreter.VisitNode(ProgramNode)
     if err != nil {
 			fmt.Println("file path invalid")
 			os.Exit(1)

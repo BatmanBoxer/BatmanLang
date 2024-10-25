@@ -12,7 +12,7 @@ type Block struct {
 	Token lexer.Token
 	Body  []Node
 }
-
+type EOF struct{}
 
 type Assignment struct {
 	Token      lexer.Token
@@ -79,5 +79,5 @@ type Identifier struct {
 }
 type PrintStatement struct {
 	Token lexer.Token
-	Value Node
+	Value Literal
 }
