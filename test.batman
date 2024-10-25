@@ -1,11 +1,15 @@
 fun main(){
   var a = "hello";
-  var b = 123
+  var b = 123 + 12;
+  b = 12+123;
   print("hello")
   fun test(){
   print("from inside")
   }
   if(a==b){
     print("from if")
+  }
+  while(b==a){
+    print("loop")
   }
 } 

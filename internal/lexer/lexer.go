@@ -51,6 +51,22 @@ func (lexer *Lexer) Tokenize() []Token {
 		} else if rune(token) == ';' {
 			lexer.consume()
 			tokens = append(tokens, Token{SEMICOLON, nil})
+		} else if rune(token) == '+' {
+			lexer.consume()
+			tokens = append(tokens, Token{PLUS, nil})
+
+		} else if rune(token) == '-' {
+			lexer.consume()
+			tokens = append(tokens, Token{MINUS, nil})
+
+		} else if rune(token) == '*' {
+			lexer.consume()
+			tokens = append(tokens, Token{MUNTIPLY, nil})
+
+		} else if rune(token) == '/' {
+			lexer.consume()
+			tokens = append(tokens, Token{DIVIDE, nil})
+
 		} else if rune(token) == '=' {
 			lexer.consume()
 			tokens = append(tokens, Token{EQUALS, nil})
@@ -68,7 +84,7 @@ func (lexer *Lexer) Tokenize() []Token {
 	return tokens
 }
 func (lexer *Lexer) checkEOF() bool {
-	return lexer.index == len(lexer.src)-1 
+	return lexer.index == len(lexer.src)-1
 }
 func (lexer *Lexer) lexAlpha() Token {
 	parsertoken := Token{-1, nil}
@@ -143,7 +159,7 @@ func (lexer *Lexer) lexString() Token {
 			lexer.buf = append(lexer.buf, rune(lexer.consume()))
 			var temp = string(lexer.buf)
 			parsedtoken = Token{STRING_LIT, &temp}
-      lexer.buf = lexer.buf[:0]
+			lexer.buf = lexer.buf[:0]
 			break
 		}
 	}

@@ -22,22 +22,38 @@ type Assignment struct {
 
 type IfStatement struct {
 	Token     lexer.Token
-	Condition Node
+	Condition BinaryExpression
 	Body      *Block
 }
 
 type FunctionDeclaration struct {
 	Token      lexer.Token
 	Name       string
-	Parameters []string
+	Parameters []interface{}
 	Body       *Block
+}
+type FunctionCall struct{
+  Token lexer.Token
+  Parameters []interface{}
+  Name string
+}
+type LoopStatement struct{
+  Token lexer.Token
+  Condition BinaryExpression
+  Body *Block
+
 }
 type Expression interface{}
 
 type VariableDeclaration struct{
   Token lexer.Token
   Name string
-  Value Expression
+  Value []lexer.Token
+}
+type VariableReasign struct{
+  Token lexer.Token
+  Name string
+  Value []lexer.Token
 }
 
 type ReturnStatement struct {

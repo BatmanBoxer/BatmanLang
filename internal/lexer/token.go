@@ -27,6 +27,11 @@ const (
 	ELSE
 	FOR
 	WHILE
+
+  PLUS
+  MINUS
+  MUNTIPLY
+  DIVIDE
 )
 
 type Token struct {
