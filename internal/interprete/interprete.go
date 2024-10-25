@@ -1,6 +1,7 @@
 package interpreter
 
 import (
+	"compileringo/internal/lexer"
 	"compileringo/internal/parser"
 	"fmt"
 	"reflect"
@@ -31,6 +32,7 @@ func (interpreter *Interpreter) VisitNode(node parser.Node) {
 		if mainFunc, exists := interpreter.FunctionMap["main"]; exists {
 			interpreter.VisitNode(mainFunc.Body)
 		} else {
+			fmt.Println("No Main Function ")
 		}
 
 	case *parser.FunctionDeclaration:
@@ -43,20 +45,54 @@ func (interpreter *Interpreter) VisitNode(node parser.Node) {
 		}
 
 	case *parser.VariableDeclaration:
+		if _, exists := interpreter.VariableMap[n.Name]; exists {
+			panic("cannot declare a variable twice")
+		}
 		interpreter.VariableMap[n.Name] = n.Value
 
 	case *parser.VariableReasign:
 		if _, exists := interpreter.VariableMap[n.Name]; exists {
 			interpreter.VariableMap[n.Name] = n.Value
 		} else {
+			panic("variable reasinged without initializing")
 		}
 
 	case *parser.PrintStatement:
 		fmt.Println("Printing: ")
-    n.Token.Debug()
+		n.Token.Debug()
+
 	case *parser.Block:
 		for _, block := range n.Body {
 			interpreter.VisitNode(block)
+		}
+	case *parser.IfStatement:
+		var leftcondition interface{}
+		var rightcondition interface{}
+
+		switch value := n.Condition.Left.(type) {
+		case lexer.Token:
+			if value.Tokentype == lexer.IDENTIFIER {
+				fmt.Println("identifier")
+			}
+      leftcondition = *value.Value
+		}
+		switch value := n.Condition.Right.(type) {
+		case lexer.Token:
+			fmt.Println(*value.Value)
+			if value.Tokentype == lexer.IDENTIFIER {
+				fmt.Println("identifier")
+			}
+      rightcondition = *value.Value
+		}
+
+    if leftcondition == rightcondition {
+      interpreter.VisitNode(n.Body)
+    }
+
+		fmt.Println("printing val")
+
+		if n.Condition.Left == n.Condition.Right {
+			interpreter.VisitNode(n.Body)
 		}
 
 	default:

@@ -6,16 +6,14 @@ fun main(){
   print("hello there")
   var a = "hello";
   var b = 123 + 12;
-  var b = 12+123;
   b = 1;
   b = a;
   print("hello")
-  if(a==b){
-    print("from if")
+  if(1==2){
+    print("batman from if")
   }
-  while(b==a){
+  while(1==a){
     print("batman")
   }
   test()
 } 
-
