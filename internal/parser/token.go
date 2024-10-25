@@ -13,6 +13,7 @@ type Block struct {
 	Body  []Node
 }
 
+
 type Assignment struct {
 	Token      lexer.Token
 	Identifier string
@@ -22,7 +23,7 @@ type Assignment struct {
 type IfStatement struct {
 	Token     lexer.Token
 	Condition Node
-	Body      []Node
+	Body      *Block
 }
 
 type FunctionDeclaration struct {
@@ -30,6 +31,13 @@ type FunctionDeclaration struct {
 	Name       string
 	Parameters []string
 	Body       *Block
+}
+type Expression interface{}
+
+type VariableDeclaration struct{
+  Token lexer.Token
+  Name string
+  Value Expression
 }
 
 type ReturnStatement struct {

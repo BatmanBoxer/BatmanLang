@@ -17,29 +17,21 @@ func NewParser(tokens []lexer.Token) *Parser {
 	}
 }
 
-func (parser *Parser) consume() lexer.Token {
-	token := parser.tokens[parser.index]
-	parser.index++
-	return token
-}
-
-func (parser *Parser) peak() lexer.Token {
-	return parser.tokens[parser.index]
-}
-
 func (parser *Parser) ParseProgram() Node {
 	program := &Program{Statements: []Node{}}
 
 	for parser.index < len(parser.tokens) {
-		token := parser.peak()
+		token := parser.peak(0)
 
 		switch token.Tokentype {
 		case lexer.FUN:
 			funcDecl := parser.parseFunctionDeclaration()
 			program.Statements = append(program.Statements, funcDecl)
-
-		default:
+		case lexer.EOF:
+			fmt.Println("parsed sucessfully")
 			parser.consume()
+		default:
+			//panic("Cannot have anything ouside function")
 		}
 	}
 
@@ -49,6 +41,8 @@ func (parser *Parser) ParseProgram() Node {
 func (parser *Parser) parseFunctionDeclaration() *FunctionDeclaration {
 	funToken := parser.consume()  // Consume the 'fun' keyword.
 	nameToken := parser.consume() // Consume the function name.
+  parser.consume()
+  parser.consume()
 	name := *nameToken.Value
 
 	body := parser.parseBlock() // Parse the block of the function.
@@ -61,16 +55,18 @@ func (parser *Parser) parseFunctionDeclaration() *FunctionDeclaration {
 	}
 }
 
-// parseBlock parses a block of code and returns it as a Block node.
+//func (parser *Parser) parseIfStatement() *IfStatement{
+//  ifToken := parser.consume()
+
+//}
+
 func (parser *Parser) parseBlock() *Block {
 	block := &Block{Token: parser.consume(), Body: []Node{}} // Consume the '{'.
 	for parser.index < len(parser.tokens) {
-		token := parser.peak() // Use peak to check the next token.
-
+		token := parser.peak(0)
 		// Check for the end of the block.
 		if token.Tokentype == lexer.RIGHT_PARAMS {
 			parser.consume() // Consume the '}'.
-			fmt.Println("reached here")
 			break
 		}
 
@@ -79,15 +75,59 @@ func (parser *Parser) parseBlock() *Block {
 			printStmt := parser.parsePrintStatement()
 			block.Body = append(block.Body, printStmt)
 
+		case lexer.FUN:
+			// Check for nested blocks.
+			nestedFunction := parser.parseFunctionDeclaration() // Recursive call for nested block.
+			block.Body = append(block.Body, nestedFunction)
+
+		case lexer.IF:
+			ifStatement := parser.parseIfStatement()
+      block.Body = append(block.Body, ifStatement)
+
+
+		case lexer.VAR:
+			variableDeclaration := parser.parseVariableDeclaration()
+			block.Body = append(block.Body, variableDeclaration)
+		case lexer.IDENTIFIER:
+			parser.consume()
+
+		case lexer.SEMICOLON:
+			parser.consume()
 		default:
-			parser.consume() // Skip unknown token.
+			fmt.Println(parser.peak(0).Tokentype)
+      fmt.Println(parser.index)
+			panic("Unknown Token")
 		}
 	}
 
 	return block
 }
 
-// parsePrintStatement parses a print statement and returns it.
+func (parser *Parser) parseIfStatement() *IfStatement {
+	ifToken := parser.consume()   // Consume the 'if' keyword.
+	parser.consume()              // Consume the (.
+	leftToken := parser.consume() //Consume the value
+
+	parser.consume() // ==
+	parser.consume() // ==
+  
+
+	rightTOken := parser.consume()
+  parser.consume()  //Consume the (
+
+  body := parser.parseBlock()
+	return &IfStatement{
+		Token: ifToken,
+		Condition: BinaryExpression{
+			Left:     leftToken,
+			Right:    rightTOken,
+			Operator: "==",
+		},
+		Body: body,
+	}
+
+}
+
 func (parser *Parser) parsePrintStatement() *PrintStatement {
 	printToken := parser.consume()       // Consume the 'print' keyword.
 	leftbraketToken := parser.consume()  // Consume the (.
@@ -107,4 +147,32 @@ func (parser *Parser) parsePrintStatement() *PrintStatement {
 		Token: printToken,
 		Value: value,
 	}
+}
+func (parser *Parser) parseVariableDeclaration() *VariableDeclaration {
+	varToken := parser.consume() //Consume the var keyword
+	identifier := parser.consume()
+	varEquals := parser.consume()  //Consume the =
+	valueToken := parser.consume() //Consume the value
+
+	if varEquals.Tokentype != lexer.EQUALS {
+		varEquals.Debug()
+		panic("Invalid Variable declaration")
+	}
+
+	return &VariableDeclaration{
+		Token: varToken,
+		Name:  *identifier.Value,
+		Value: valueToken,
+	}
+
+}
+
+func (parser *Parser) consume() lexer.Token {
+	token := parser.tokens[parser.index]
+	parser.index++
+	return token
+}
+
+func (parser *Parser) peak(i int) lexer.Token {
+	return parser.tokens[parser.index+i]
 }
