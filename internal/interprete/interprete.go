@@ -20,30 +20,41 @@ func NewInterpreter() *Interpreter {
 	}
 }
 
+
+
 func (interpreter *Interpreter) getVariableValue(name string) string {
 	value, exists := interpreter.VariableMap[name]
+	var sb strings.Builder
+
 	if !exists {
 		panic("Undefined variable: " + name)
 	}
 
 	switch v := value.(type) {
-	case []lexer.Token: //Handle slice of tokens
+	case []lexer.Token:
 		for _, token := range v {
 			switch token.Tokentype {
 			case lexer.IDENTIFIER:
-				return interpreter.getVariableValue(*token.Value) // Resolve identifier.
+						resolvedValue := interpreter.getVariableValue(*token.Value)
+				sb.WriteString(resolvedValue)
 			case lexer.STRING_LIT:
-				return *token.Value
+				sb.WriteString(*token.Value)
 			case lexer.INT_LIT:
-				return *token.Value
-
+				sb.WriteString(*token.Value)
+      case lexer.PLUS:
+        sb.WriteString("+")
+      case lexer.MINUS:
+        sb.WriteString("-")
+      case lexer.DIVIDE:
+        sb.WriteString("/")
+      case lexer.MULTIPLY:
+        sb.WriteString("*")
 			default:
-				panic("cant acess this variable")
+				panic("Can't access this variable")
 			}
 		}
-	}
-	return "-1" // If nothing matches, return nil.
-
+  }
+	return sb.String()
 }
 
 func (interpreter *Interpreter) VisitNode(node parser.Node) {
