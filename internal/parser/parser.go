@@ -28,8 +28,10 @@ func (parser *Parser) ParseProgram() Node {
 			funcDecl := parser.parseFunctionDeclaration()
 			program.Statements = append(program.Statements, funcDecl)
 		case lexer.EOF:
-			fmt.Println("parsed sucessfully")
 			parser.consume()
+    case lexer.LEFT_PARAMS:
+      bodyDecl:=  parser.parseBlock()
+      program.Statements = append(program.Statements,bodyDecl)
 		default:
 			panic("Cannot have anything ouside function")
 		}
@@ -105,10 +107,13 @@ func (parser *Parser) parseBlock() *Block {
 			if !parser.isVariableReasign() && !parser.isfunCall() && parser.tokens[parser.index].Tokentype ==lexer.IDENTIFIER {
         panic("invalid use of identifier idiot")
 			}
-
+    case lexer.LEFT_PARAMS:
+      nestedBlock :=parser.parseBlock()
+      block.Body = append(block.Body, nestedBlock)
 		case lexer.SEMICOLON:
 			parser.consume()
 		default:
+      token.Debug()
 			panic("unknown token here")
 		}
 	}

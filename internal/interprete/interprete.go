@@ -5,15 +5,14 @@ import (
 	"compileringo/internal/parser"
 	"fmt"
 	"reflect"
+	"strings"
 )
 
-// Interpreter struct to manage function and variable maps.
 type Interpreter struct {
 	FunctionMap map[string]*parser.FunctionDeclaration
 	VariableMap map[string]interface{}
 }
 
-// NewInterpreter creates a new instance of the interpreter.
 func NewInterpreter() *Interpreter {
 	return &Interpreter{
 		FunctionMap: make(map[string]*parser.FunctionDeclaration),
@@ -21,7 +20,32 @@ func NewInterpreter() *Interpreter {
 	}
 }
 
-// VisitNode traverses the AST and executes or stores functions/variables.
+func (interpreter *Interpreter) getVariableValue(name string) string {
+	value, exists := interpreter.VariableMap[name]
+	if !exists {
+		panic("Undefined variable: " + name)
+	}
+
+	switch v := value.(type) {
+	case []lexer.Token: //Handle slice of tokens
+		for _, token := range v {
+			switch token.Tokentype {
+			case lexer.IDENTIFIER:
+				return interpreter.getVariableValue(*token.Value) // Resolve identifier.
+			case lexer.STRING_LIT:
+				return *token.Value
+			case lexer.INT_LIT:
+				return *token.Value
+
+			default:
+				panic("cant acess this variable")
+			}
+		}
+	}
+	return "-1" // If nothing matches, return nil.
+
+}
+
 func (interpreter *Interpreter) VisitNode(node parser.Node) {
 	switch n := node.(type) {
 
@@ -58,12 +82,19 @@ func (interpreter *Interpreter) VisitNode(node parser.Node) {
 		}
 
 	case *parser.PrintStatement:
-		fmt.Println("Printing: ")
-		n.Token.Debug()
+		switch n.Token.Tokentype {
+		case lexer.IDENTIFIER:
+			fmt.Println(interpreter.getVariableValue(*n.Token.Value))
+		default:
+			fmt.Println(strings.ReplaceAll(*n.Token.Value, `"`, ""))
+		}
 
 	case *parser.Block:
 		for _, block := range n.Body {
+			//add scoping logic here
 			interpreter.VisitNode(block)
+			//remove the scope from the stack here
+
 		}
 	case *parser.IfStatement:
 		var leftcondition interface{}
@@ -72,26 +103,47 @@ func (interpreter *Interpreter) VisitNode(node parser.Node) {
 		switch value := n.Condition.Left.(type) {
 		case lexer.Token:
 			if value.Tokentype == lexer.IDENTIFIER {
-				fmt.Println("identifier")
+				leftcondition = interpreter.getVariableValue(*value.Value)
+			} else {
+				leftcondition = *value.Value
 			}
-      leftcondition = *value.Value
 		}
 		switch value := n.Condition.Right.(type) {
 		case lexer.Token:
 			fmt.Println(*value.Value)
 			if value.Tokentype == lexer.IDENTIFIER {
-				fmt.Println("identifier")
+				rightcondition = interpreter.getVariableValue(*value.Value)
+			} else {
+				rightcondition = *value.Value
 			}
-      rightcondition = *value.Value
+
+		}
+		if leftcondition == rightcondition {
+			interpreter.VisitNode(n.Body)
+		}
+	case *parser.LoopStatement:
+		var leftcondition interface{}
+		var rightcondition interface{}
+		switch value := n.Condition.Left.(type) {
+		case lexer.Token:
+			if value.Tokentype == lexer.IDENTIFIER {
+				leftcondition = interpreter.getVariableValue(*value.Value)
+			} else {
+				leftcondition = *value.Value
+			}
+		}
+		switch value := n.Condition.Right.(type) {
+		case lexer.Token:
+			fmt.Println(*value.Value)
+			if value.Tokentype == lexer.IDENTIFIER {
+				rightcondition = interpreter.getVariableValue(*value.Value)
+			} else {
+				rightcondition = *value.Value
+			}
+
 		}
 
-    if leftcondition == rightcondition {
-      interpreter.VisitNode(n.Body)
-    }
-
-		fmt.Println("printing val")
-
-		if n.Condition.Left == n.Condition.Right {
+		if leftcondition == rightcondition {
 			interpreter.VisitNode(n.Body)
 		}
 
