@@ -18,7 +18,7 @@ type Interpreter struct {
 func NewInterpreter() *Interpreter {
 	return &Interpreter{
 		FunctionMap: make(map[string]*parser.FunctionDeclaration),
-		VariableMap: []map[string]interface{}{{}},
+		VariableMap: []map[string]interface{}{},
 	}
 }
 
