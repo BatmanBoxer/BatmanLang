@@ -22,15 +22,14 @@ func NewInterpreter() *Interpreter {
 	}
 }
 
-func evaluateExpression(str string) string {
+func evaluateExpression(str string) (string, error) {
 	expression := str
 	result, err := expr.Eval(expression, nil)
 	if err != nil {
-		fmt.Println("string is ")
-		fmt.Println(str)
+		return str, err
 	}
 
-	return fmt.Sprintf("%v", result)
+	return fmt.Sprintf("%v", result), nil
 }
 
 func (interpreter *Interpreter) getVariableValue(name string) string {
@@ -94,11 +93,18 @@ func (interpreter *Interpreter) VisitNode(node parser.Node) {
 			panic("cannot declare a variable twice")
 		}
 		interpreter.VariableMap[n.Name] = n.Value
-		value := evaluateExpression(interpreter.getVariableValue(n.Name))
-		interpreter.VariableMap[n.Name] = []lexer.Token{{
-			Tokentype: lexer.INT_LIT,
-			Value:     &value,
-		}}
+		value, err := evaluateExpression(interpreter.getVariableValue(n.Name))
+		if err != nil {
+			interpreter.VariableMap[n.Name] = []lexer.Token{{
+				Tokentype: lexer.INT_LIT,
+				Value:     &value,
+			}}
+		} else {
+			interpreter.VariableMap[n.Name] = []lexer.Token{{
+				Tokentype: lexer.INT_LIT,
+				Value:     &value,
+			}}
+		}
 
 	case *parser.VariableReasign:
 		if _, exists := interpreter.VariableMap[n.Name]; exists {
@@ -129,16 +135,24 @@ func (interpreter *Interpreter) VisitNode(node parser.Node) {
 					panic("Unsupported token type in variable reassignment")
 				}
 			}
-
+			fmt.Println(newExpression.String())
 			// Evaluate the new expression
-			evaluatedValue := evaluateExpression(newExpression.String())
+			evaluatedValue, err := evaluateExpression(newExpression.String())
 
 			// Update the VariableMap with the new evaluated value
-			interpreter.VariableMap[n.Name] = []lexer.Token{{
-				Tokentype: lexer.INT_LIT,
-				Value:     &evaluatedValue,
-			}}
-			fmt.Println("Updated value of", n.Name, ":", evaluatedValue)
+			if err != nil {
+				interpreter.VariableMap[n.Name] = []lexer.Token{{
+					Tokentype: lexer.INT_LIT,
+					Value:     &evaluatedValue,
+				}}
+
+			} else {
+				interpreter.VariableMap[n.Name] = []lexer.Token{{
+					Tokentype: lexer.INT_LIT,
+					Value:     &evaluatedValue,
+				}}
+
+			}
 		} else {
 			panic("Variable reassigned without initializing")
 		}
@@ -184,7 +198,7 @@ func (interpreter *Interpreter) VisitNode(node parser.Node) {
 	case *parser.LoopStatement:
 		var leftcondition interface{}
 		var rightcondition interface{}
-		for{
+		for {
 			interpreter.VisitNode(n.Body)
 			switch value := n.Condition.Left.(type) {
 			case lexer.Token:
@@ -202,9 +216,9 @@ func (interpreter *Interpreter) VisitNode(node parser.Node) {
 					rightcondition = *value.Value
 				}
 			}
-      if leftcondition == rightcondition{
-      break
-      }
+			if leftcondition == rightcondition {
+				break
+			}
 		}
 
 	default:

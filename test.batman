@@ -2,9 +2,13 @@ fun test(){
   print("hello")
 }
 fun main(){
+  var name = "darwin";
+  var person = name;
+  print(person)
   var a = 1;
   var b =10;
-  if(a==1){
+  a=a+9;
+  if(a==b){
     print("batman from if")
   }
   while(a==19){
