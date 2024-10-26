@@ -2,25 +2,16 @@ fun test(){
   print("hello")
 }
 fun main(){
-  {
-    print("from this scopd")
-  }
-  {
-  print("from another scope")
-  }
-  var a = 234;
-  print(a)
-  print("hello there")
-  var b = 123 + 12;
-  b = 1;
-  var c = 234;
-  b = a;
-  print("hello")
-  if(a==c){
+  var a = 1;
+  var b =10;
+  if(a==1){
     print("batman from if")
   }
-  while(1==1){
-    print("batman from loop")
+  while(a==19){
+    print(a)
+    print(b)
+    a = a+1;
   }
   test()
 } 
+

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+
+	"github.com/expr-lang/expr"
 )
 
 type Interpreter struct {
@@ -20,12 +22,20 @@ func NewInterpreter() *Interpreter {
 	}
 }
 
+func evaluateExpression(str string) string {
+	expression := str
+	result, err := expr.Eval(expression, nil)
+	if err != nil {
+		fmt.Println("string is ")
+		fmt.Println(str)
+	}
 
+	return fmt.Sprintf("%v", result)
+}
 
 func (interpreter *Interpreter) getVariableValue(name string) string {
 	value, exists := interpreter.VariableMap[name]
 	var sb strings.Builder
-
 	if !exists {
 		panic("Undefined variable: " + name)
 	}
@@ -35,25 +45,25 @@ func (interpreter *Interpreter) getVariableValue(name string) string {
 		for _, token := range v {
 			switch token.Tokentype {
 			case lexer.IDENTIFIER:
-						resolvedValue := interpreter.getVariableValue(*token.Value)
+				resolvedValue := interpreter.getVariableValue(*token.Value)
 				sb.WriteString(resolvedValue)
 			case lexer.STRING_LIT:
 				sb.WriteString(*token.Value)
 			case lexer.INT_LIT:
 				sb.WriteString(*token.Value)
-      case lexer.PLUS:
-        sb.WriteString("+")
-      case lexer.MINUS:
-        sb.WriteString("-")
-      case lexer.DIVIDE:
-        sb.WriteString("/")
-      case lexer.MULTIPLY:
-        sb.WriteString("*")
+			case lexer.PLUS:
+				sb.WriteString("+")
+			case lexer.MINUS:
+				sb.WriteString("-")
+			case lexer.DIVIDE:
+				sb.WriteString("/")
+			case lexer.MULTIPLY:
+				sb.WriteString("*")
 			default:
 				panic("Can't access this variable")
 			}
 		}
-  }
+	}
 	return sb.String()
 }
 
@@ -84,12 +94,53 @@ func (interpreter *Interpreter) VisitNode(node parser.Node) {
 			panic("cannot declare a variable twice")
 		}
 		interpreter.VariableMap[n.Name] = n.Value
+		value := evaluateExpression(interpreter.getVariableValue(n.Name))
+		interpreter.VariableMap[n.Name] = []lexer.Token{{
+			Tokentype: lexer.INT_LIT,
+			Value:     &value,
+		}}
 
 	case *parser.VariableReasign:
 		if _, exists := interpreter.VariableMap[n.Name]; exists {
-			interpreter.VariableMap[n.Name] = n.Value
+			// Get the current value of the variable
+
+			// Assuming n.Value is a slice of lexer.Token
+			var newExpression strings.Builder
+			// Loop over the tokens in n.Value
+			for _, token := range n.Value {
+				switch token.Tokentype {
+				case lexer.PLUS:
+					newExpression.WriteString(" + ")
+				case lexer.MINUS:
+					newExpression.WriteString(" - ")
+				case lexer.MULTIPLY:
+					newExpression.WriteString(" * ")
+				case lexer.DIVIDE:
+					newExpression.WriteString(" / ")
+				case lexer.IDENTIFIER:
+					// Resolve the identifier value
+					newValue := interpreter.getVariableValue(*token.Value)
+					newExpression.WriteString(newValue)
+				case lexer.INT_LIT:
+					newExpression.WriteString(*token.Value) // Assuming token.Value is a pointer to a string
+				case lexer.STRING_LIT:
+					newExpression.WriteString(*token.Value) // Assuming token.Value is a pointer to a string
+				default:
+					panic("Unsupported token type in variable reassignment")
+				}
+			}
+
+			// Evaluate the new expression
+			evaluatedValue := evaluateExpression(newExpression.String())
+
+			// Update the VariableMap with the new evaluated value
+			interpreter.VariableMap[n.Name] = []lexer.Token{{
+				Tokentype: lexer.INT_LIT,
+				Value:     &evaluatedValue,
+			}}
+			fmt.Println("Updated value of", n.Name, ":", evaluatedValue)
 		} else {
-			panic("variable reasinged without initializing")
+			panic("Variable reassigned without initializing")
 		}
 
 	case *parser.PrintStatement:
@@ -102,12 +153,11 @@ func (interpreter *Interpreter) VisitNode(node parser.Node) {
 
 	case *parser.Block:
 		for _, block := range n.Body {
-			//add scoping logic here
 			interpreter.VisitNode(block)
-			//remove the scope from the stack here
 
 		}
 	case *parser.IfStatement:
+
 		var leftcondition interface{}
 		var rightcondition interface{}
 
@@ -121,7 +171,6 @@ func (interpreter *Interpreter) VisitNode(node parser.Node) {
 		}
 		switch value := n.Condition.Right.(type) {
 		case lexer.Token:
-			fmt.Println(*value.Value)
 			if value.Tokentype == lexer.IDENTIFIER {
 				rightcondition = interpreter.getVariableValue(*value.Value)
 			} else {
@@ -135,27 +184,27 @@ func (interpreter *Interpreter) VisitNode(node parser.Node) {
 	case *parser.LoopStatement:
 		var leftcondition interface{}
 		var rightcondition interface{}
-		switch value := n.Condition.Left.(type) {
-		case lexer.Token:
-			if value.Tokentype == lexer.IDENTIFIER {
-				leftcondition = interpreter.getVariableValue(*value.Value)
-			} else {
-				leftcondition = *value.Value
-			}
-		}
-		switch value := n.Condition.Right.(type) {
-		case lexer.Token:
-			fmt.Println(*value.Value)
-			if value.Tokentype == lexer.IDENTIFIER {
-				rightcondition = interpreter.getVariableValue(*value.Value)
-			} else {
-				rightcondition = *value.Value
-			}
-
-		}
-
-		if leftcondition == rightcondition {
+		for{
 			interpreter.VisitNode(n.Body)
+			switch value := n.Condition.Left.(type) {
+			case lexer.Token:
+				if value.Tokentype == lexer.IDENTIFIER {
+					leftcondition = interpreter.getVariableValue(*value.Value)
+				} else {
+					leftcondition = *value.Value
+				}
+			}
+			switch value := n.Condition.Right.(type) {
+			case lexer.Token:
+				if value.Tokentype == lexer.IDENTIFIER {
+					rightcondition = interpreter.getVariableValue(*value.Value)
+				} else {
+					rightcondition = *value.Value
+				}
+			}
+      if leftcondition == rightcondition{
+      break
+      }
 		}
 
 	default:
