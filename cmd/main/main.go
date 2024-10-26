@@ -23,6 +23,7 @@ func main() {
     ProgramNode := parser.ParseProgram()
 
     interpreter := interpreter.NewInterpreter()
+    interpreter.PushStack()
     interpreter.VisitNode(ProgramNode)
     if err != nil {
 			fmt.Println("file path invalid")

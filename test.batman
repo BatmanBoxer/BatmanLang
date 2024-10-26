@@ -2,19 +2,20 @@ fun test(){
   print("hello")
 }
 fun main(){
-  var name = "darwin";
-  var person = name;
-  print(person)
-  var a = 1;
+  var p = 1;
+  print(p)
+  var a = 10;
   var b =10;
-  a=a+9;
+  
   if(a==b){
     print("batman from if")
   }
   while(a==19){
+    var darwin = 1;
+    print(darwin)
+    print("this is the value of a ")
     print(a)
-    print(b)
-    a = a+1;
+    a=a+1;
   }
   test()
 } 
