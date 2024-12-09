@@ -17,7 +17,7 @@ fun batman(){
 }
 ```
 
-1) No need for any syscalls for printing . you can do it with a simple print statement. this is revolutionart
+1) No need for any syscalls for printing . you can do it with a simple print statement. this is revolution art
 
 ```java
 print("Hello world")
@@ -30,7 +30,7 @@ var i = 1;
 print(i)
 ```
 
-3) No commets Beause if you need comment to tell you what code does just get better
+3) No comments Beause if you need comment to tell you what code does just get better
 4) You can create another function and call it as well (it has scoping too cause its just basic stuff(gives a cool error when you break scoping rules) )
 
 ```java
@@ -61,7 +61,7 @@ fun batman(){
 }
 
 ```
-5) Conditional Statements: Batmanlang supports simple if conditions and no else only only weak programmer use else
+5) Conditional Statements: Batmanlang supports simple if conditions and no else  only weak programmer use else
    
   ```java
 if(condition){
