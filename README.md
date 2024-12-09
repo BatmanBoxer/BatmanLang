@@ -3,7 +3,7 @@
 Batmanlang is a perfect stack based programming language (no heap == no segfault). These are its features!<br>
 
 How to use
-- git clone https://github.com/BatmanBoxer/Interpreter-in-Go
+- git clone https://github.com/BatmanBoxer/BatmanLang
 - cd interpreter-in-go
 - go mod tidy
 - go run cmd/main/main.go [filename].batman
